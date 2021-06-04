@@ -19,8 +19,8 @@ public class HomeController {
         return "Hello "+name;
     }
 
-    @GetMapping("/heath")
-    public String health(@RequestParam String name){
+    @GetMapping("/health")
+    public String health(){
         return "I am running"+ new Date();
     }
 }
