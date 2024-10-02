@@ -7,7 +7,7 @@ trigger:
 pr: none
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-latest'  # Change this if you're using a Windows agent
 
 stages:
   - stage: SIT_UAT
@@ -18,9 +18,14 @@ stages:
         displayName: 'Copy Files to SIT Databricks Workspace'
         steps:
           - script: |
-              echo "Copying files to SIT workspace: $(SIT_WORKSPACE)"
-              # Add the command to copy files to the SIT Databricks workspace
-              echo "Files copied to SIT Databricks Workspace"
+              echo "This is a test message for SIT."
+              echo "Workspace Name: ${{ variables.SIT_WORKSPACE }}"
+            displayName: 'Echo Workspace Name'
+          - script: |
+              echo "Current PATH: $PATH"
+              # Replace this with the command to copy files, if using Databricks CLI
+              # databricks fs cp /local/path ${{ variables.SIT_WORKSPACE }} --recursive
+            displayName: 'Check Tools Availability'
         variables:
           SIT_WORKSPACE: 'sit-databricks-workspace-url'
 
@@ -29,9 +34,13 @@ stages:
         dependsOn: CopyToSIT
         steps:
           - script: |
-              echo "Copying files to UAT workspace: $(UAT_WORKSPACE)"
-              # Add the command to copy files to the UAT Databricks workspace
-              echo "Files copied to UAT Databricks Workspace"
+              echo "This is a test message for UAT."
+              echo "Workspace Name: ${{ variables.UAT_WORKSPACE }}"
+            displayName: 'Echo Workspace Name'
+          - script: |
+              echo "Current PATH: $PATH"
+              # databricks fs cp /local/path ${{ variables.UAT_WORKSPACE }} --recursive
+            displayName: 'Check Tools Availability'
         variables:
           UAT_WORKSPACE: 'uat-databricks-workspace-url'
 
@@ -43,8 +52,12 @@ stages:
         displayName: 'Copy Files to Prod Databricks Workspace'
         steps:
           - script: |
-              echo "Copying files to Production workspace: $(PROD_WORKSPACE)"
-              # Add the command to copy files to the Production Databricks workspace
-              echo "Files copied to Prod Databricks Workspace"
+              echo "This is a test message for Production."
+              echo "Workspace Name: ${{ variables.PROD_WORKSPACE }}"
+            displayName: 'Echo Workspace Name'
+          - script: |
+              echo "Current PATH: $PATH"
+              # databricks fs cp /local/path ${{ variables.PROD_WORKSPACE }} --recursive
+            displayName: 'Check Tools Availability'
         variables:
           PROD_WORKSPACE: 'prod-databricks-workspace-url'
