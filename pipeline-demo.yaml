@@ -11,6 +11,7 @@ parameters:
     values:
       - dev
       - uat
+      - master
 
 stages:
   - stage: SelectBranch
@@ -21,6 +22,35 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         steps:
+          # Task to echo the selected branch name
           - script: |
-              echo "Running pipeline on the branch: $(parameters.branchSelector)"
+              echo "Running pipeline on the branch: ${{ parameters.branchSelector }}"
             displayName: "Echo the branch name"
+
+  # SIT Stage - Runs only when the selected branch is 'master'
+  - stage: SIT
+    displayName: "SIT Stage"
+    condition: and(succeeded(), eq('${{ parameters.branchSelector }}', 'master'))
+    jobs:
+      - job: SITJob
+        displayName: "SIT Job"
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              echo "Running SIT tests..."
+            displayName: "Echo SIT"
+
+  # UAT Stage - Runs only when the selected branch is 'master'
+  - stage: UAT
+    displayName: "UAT Stage"
+    condition: and(succeeded(), eq('${{ parameters.branchSelector }}', 'master'))
+    jobs:
+      - job: UATJob
+        displayName: "UAT Job"
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              echo "Running UAT tests..."
+            displayName: "Echo UAT"
