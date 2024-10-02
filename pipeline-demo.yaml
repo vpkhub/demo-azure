@@ -1,74 +1,50 @@
-trigger: none   # No automatic triggers, pipeline will be run manually
-
-pr: none        # No PR trigger, pipeline will not run on PRs automatically
-
-# Define parameters for branch selection
-parameters:
-  - name: branchSelector
-    displayName: "Select branch"
-    type: string
-    default: dev
-    values:
-      - dev
-      - uat
+trigger:
+  branches:
+    include:
       - master
+      - production
+
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
 
 stages:
-  - stage: SelectBranch
-    displayName: "Branch Selection"
+  - stage: SIT_UAT
+    displayName: 'Deploy to SIT and UAT Workspaces'
+    condition: eq(variables['Build.SourceBranchName'], 'master')
     jobs:
-      - job: EchoBranch
-        displayName: "Echo Selected Branch Name"
-        pool:
-          vmImage: 'ubuntu-latest'
+      - job: CopyToSIT
+        displayName: 'Copy Files to SIT Databricks Workspace'
         steps:
-          # Task to echo the selected branch name
           - script: |
-              echo "Running pipeline on the branch: ${{ parameters.branchSelector }}"
-            displayName: "Echo the branch name"
+              echo "Copying files to SIT workspace: $(SIT_WORKSPACE)"
+              # Add the command to copy files to the SIT Databricks workspace
+              echo "Files copied to SIT Databricks Workspace"
+        variables:
+          SIT_WORKSPACE: 'sit-databricks-workspace-url'
 
-  # SIT Stage - Runs only when the selected branch is 'master'
-  - stage: SIT
-    displayName: "SIT Stage"
-    condition: and(succeeded(), eq('${{ parameters.branchSelector }}', 'master'))
-    jobs:
-      - job: SITJob
-        displayName: "SIT Job"
-        pool:
-          vmImage: 'ubuntu-latest'
+      - job: CopyToUAT
+        displayName: 'Copy Files to UAT Databricks Workspace'
+        dependsOn: CopyToSIT
         steps:
           - script: |
-              echo "Running SIT tests..."
-            displayName: "Echo SIT Step 1"
-          - script: |
-              echo "Step 2: Validating SIT environment..."
-            displayName: "SIT Validation Step"
-          - script: |
-              echo "Step 3: Deploying to SIT environment..."
-            displayName: "SIT Deployment Step"
-          - script: |
-              echo "Step 4: Running SIT cleanup..."
-            displayName: "SIT Cleanup Step"
+              echo "Copying files to UAT workspace: $(UAT_WORKSPACE)"
+              # Add the command to copy files to the UAT Databricks workspace
+              echo "Files copied to UAT Databricks Workspace"
+        variables:
+          UAT_WORKSPACE: 'uat-databricks-workspace-url'
 
-  # UAT Stage - Runs only when the selected branch is 'master'
-  - stage: UAT
-    displayName: "UAT Stage"
-    condition: and(succeeded(), eq('${{ parameters.branchSelector }}', 'master'))
+  - stage: Production
+    displayName: 'Deploy to Production Workspace'
+    condition: eq(variables['Build.SourceBranchName'], 'production')
     jobs:
-      - job: UATJob
-        displayName: "UAT Job"
-        pool:
-          vmImage: 'ubuntu-latest'
+      - job: CopyToProd
+        displayName: 'Copy Files to Prod Databricks Workspace'
         steps:
           - script: |
-              echo "Running UAT tests..."
-            displayName: "Echo UAT Step 1"
-          - script: |
-              echo "Step 2: Validating UAT environment..."
-            displayName: "UAT Validation Step"
-          - script: |
-              echo "Step 3: Deploying to UAT environment..."
-            displayName: "UAT Deployment Step"
-          - script: |
-              echo "Step 4: Running UAT cleanup..."
-            displayName: "UAT Cleanup Step"
+              echo "Copying files to Production workspace: $(PROD_WORKSPACE)"
+              # Add the command to copy files to the Production Databricks workspace
+              echo "Files copied to Prod Databricks Workspace"
+        variables:
+          PROD_WORKSPACE: 'prod-databricks-workspace-url'
