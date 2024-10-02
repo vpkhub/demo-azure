@@ -1,0 +1,52 @@
+parameters:
+  - name: databricksWorkspaceSIT
+    type: string
+    default: ''
+  - name: databricksWorkspaceUAT
+    type: string
+    default: ''
+  - name: databricksWorkspaceProd
+    type: string
+    default: ''
+  - name: targetBranch
+    type: string
+    default: 'master'
+
+stages:
+  - stage: SIT_UAT
+    displayName: 'Deploy to SIT and UAT Workspaces'
+    condition: and(succeeded(), eq('${{ parameters.targetBranch }}', 'master'))
+    jobs:
+      - job: CopyToSIT
+        displayName: 'Copy Files to SIT Databricks Workspace'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              echo "Copying files to SIT workspace: ${{ parameters.databricksWorkspaceSIT }}"
+              # Add your command to copy files to SIT Databricks workspace here
+            displayName: 'Copy Files to SIT Workspace'
+      - job: CopyToUAT
+        displayName: 'Copy Files to UAT Databricks Workspace'
+        dependsOn: CopyToSIT
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              echo "Copying files to UAT workspace: ${{ parameters.databricksWorkspaceUAT }}"
+              # Add your command to copy files to UAT Databricks workspace here
+            displayName: 'Copy Files to UAT Workspace'
+
+  - stage: Prod
+    displayName: 'Deploy to Production Workspace'
+    condition: and(succeeded(), eq('${{ parameters.targetBranch }}', 'production'))
+    jobs:
+      - job: CopyToProd
+        displayName: 'Copy Files to Prod Databricks Workspace'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              echo "Copying files to Prod workspace: ${{ parameters.databricksWorkspaceProd }}"
+              # Add your command to copy files to Production Databricks workspace here
+            displayName: 'Copy Files to Prod Workspace'
