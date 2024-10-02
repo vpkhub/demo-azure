@@ -1,0 +1,18 @@
+trigger:
+  branches:
+    include:
+      - master
+      - production
+
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+  - template: azure-pipelines-template.yml  # Referencing the central template
+    parameters:
+      databricksWorkspaceSIT: 'sit-databricks-workspace-url'  # SIT workspace URL
+      databricksWorkspaceUAT: 'uat-databricks-workspace-url'  # UAT workspace URL
+      databricksWorkspaceProd: 'prod-databricks-workspace-url' # Prod workspace URL
+      targetBranch: ${{ variables['Build.SourceBranchName'] }}  # Automatically gets the branch name
