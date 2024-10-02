@@ -2,21 +2,7 @@ trigger: none   # No automatic triggers, pipeline will be run manually
 
 pr: none        # No PR trigger, pipeline will not run on PRs automatically
 
-stages:
-  - stage: SelectBranch
-    displayName: "Branch Selection"
-    jobs:
-      - job: BranchJob
-        displayName: "Echo Selected Branch"
-        pool:
-          vmImage: 'ubuntu-latest'
-        steps:
-          - task: PowerShell@2
-            inputs:
-              targetType: 'inline'
-              script: |
-                Write-Host "Running on branch: $(Build.SourceBranch)"
-                
+# Define parameters for branch selection
 parameters:
   - name: branchSelector
     displayName: "Select branch"
@@ -26,16 +12,15 @@ parameters:
       - dev
       - uat
 
-jobs:
-  - job: EchoBranch
-    displayName: "Echo Selected Branch Name"
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-      - checkout: self
-        persistCredentials: true
-
-      - script: |
-          echo "Running pipeline on the branch: $(parameters.branchSelector)"
-        displayName: "Echo the branch name"
-
+stages:
+  - stage: SelectBranch
+    displayName: "Branch Selection"
+    jobs:
+      - job: EchoBranch
+        displayName: "Echo Selected Branch Name"
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              echo "Running pipeline on the branch: $(parameters.branchSelector)"
+            displayName: "Echo the branch name"
