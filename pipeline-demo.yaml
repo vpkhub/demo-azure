@@ -39,7 +39,16 @@ stages:
         steps:
           - script: |
               echo "Running SIT tests..."
-            displayName: "Echo SIT"
+            displayName: "Echo SIT Step 1"
+          - script: |
+              echo "Step 2: Validating SIT environment..."
+            displayName: "SIT Validation Step"
+          - script: |
+              echo "Step 3: Deploying to SIT environment..."
+            displayName: "SIT Deployment Step"
+          - script: |
+              echo "Step 4: Running SIT cleanup..."
+            displayName: "SIT Cleanup Step"
 
   # UAT Stage - Runs only when the selected branch is 'master'
   - stage: UAT
@@ -53,4 +62,13 @@ stages:
         steps:
           - script: |
               echo "Running UAT tests..."
-            displayName: "Echo UAT"
+            displayName: "Echo UAT Step 1"
+          - script: |
+              echo "Step 2: Validating UAT environment..."
+            displayName: "UAT Validation Step"
+          - script: |
+              echo "Step 3: Deploying to UAT environment..."
+            displayName: "UAT Deployment Step"
+          - script: |
+              echo "Step 4: Running UAT cleanup..."
+            displayName: "UAT Cleanup Step"
